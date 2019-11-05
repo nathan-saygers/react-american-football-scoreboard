@@ -10,7 +10,50 @@ function App() {
   const [homeScore, setHomeScore] = useState(0);
   const [awayScore, setAwayScore] = useState(0);
   const [quarter, setQuarter] = useState(1);
-  
+  const [down, setDown] = useState(1);
+  const [toGo, setToGo] = useState(10);
+  const [ballOn, setBallOn] = useState(20);
+  const [yards, setYards] = useState(0);
+
+  const advanceQuarter = () => {
+    if(quarter < 4){
+      setQuarter(quarter + 1);
+    } else {
+      setQuarter(1);
+    }
+  } 
+
+  const advanceDown = () => {
+    if(down < 4){
+      setDown(down + 1);
+    } else {
+      setDown(1);
+      setToGo(10);
+      setBallOn(20);
+    }
+  }
+
+  const handleInput = (e) => {
+    setYards(Number(e.target.value));
+  }
+
+  const advanceYards = (e) => {
+    e.preventDefault();
+    if(ballOn + yards > 99){
+      setBallOn(20);
+      setToGo(10);
+    } else {
+      setBallOn(ballOn + yards);
+    }
+    if((toGo - yards) < 1){
+      setToGo(10);
+      setDown(1);
+    } else {
+      setToGo(toGo - yards);
+      advanceDown();
+    }
+  }
+
   return (
     <div className="container">
       <section className="scoreboard">
@@ -29,7 +72,7 @@ function App() {
             <div className="away__score">{awayScore}</div>
           </div>
         </div>
-        <BottomRow />
+        <BottomRow quarter={quarter} down={down} toGo={toGo} ballOn={ballOn}/>
       </section>
       <section className="buttons">
         <div className="homeButtons">
@@ -42,7 +85,9 @@ function App() {
           <button onClick={() => setAwayScore(awayScore + 3)}className="awayButtons__fieldGoal">Away Field Goal</button>
         </div>
         <div className="bottomRowButtons">
-            <button onClick={() => setQuarter(quarter + 1)}>Advance Quarter</button>
+            <button onClick={advanceQuarter}>Advance Quarter</button>
+            <button onClick={advanceDown}>Advance Down</button>
+            <form onSubmit={advanceYards}><input onChange={handleInput} type="number" max="80"/></form>
         </div>
       </section>
     </div>
